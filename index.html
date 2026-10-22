@@ -3,164 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEMASSIZ GİRİŞİM</title>
+    <title>Hızlı Ödeme | Temassız Girişim</title>
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af, #515bd4);
-            background-size: 400% 400%;
-            animation: gradientAnim 10s ease infinite;
-            color: #ffffff;
+            background-color: #f4f6f9;
+            color: #222;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
         }
-        @keyframes gradientAnim {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .card-container {
+        .container {
+            background: #ffffff;
             width: 100%;
-            max-width: 420px;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 28px;
-            padding: 35px 25px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            max-width: 400px;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .hidden {
+            display: none !important;
+        }
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #111;
             text-align: center;
         }
-        h1 {
-            font-size: 24px;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-            color: #ffffff;
+        p.subtitle {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .label-small {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
             font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 2px;
         }
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #ffffff;
-            text-decoration: none;
-            padding: 16px 20px;
-            border-radius: 16px;
-            margin-bottom: 14px;
-            font-size: 16px;
+        .value {
+            font-size: 15px;
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: #111;
+            word-break: break-all;
         }
-        .btn:active {
-            transform: scale(0.97);
-            background: rgba(255, 255, 255, 0.3);
-        }
-        .iban-box {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px dashed rgba(255, 255, 255, 0.4);
-            border-radius: 18px;
-            padding: 20px;
-            margin-top: 25px;
-            text-align: left;
-        }
-        .iban-header {
+        .iban-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #f3e8ff;
-            font-weight: 500;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-top: 4px;
         }
-        .iban-number {
+        .iban-text {
             font-family: monospace;
-            font-size: 16px;
-            letter-spacing: 1px;
-            color: #ffffff;
-            word-break: break-all;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
+            color: #000;
         }
         .copy-btn {
-            background: #ffffff;
-            color: #8134af;
+            background: #34c759;
+            color: white;
             border: none;
-            padding: 8px 18px;
-            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: 700;
-            font-size: 14px;
-            transition: all 0.2s ease;
+            white-space: nowrap;
         }
-        .copy-btn:active {
-            transform: scale(0.95);
-            background: #f3e8ff;
+        .copy-btn.copied {
+            background: #248a3d;
+        }
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding: 10px 0 0 0;
         }
     </style>
 </head>
 <body>
 
-    <div class="card-container">
-        <h1>TEMASSIZ GİRİŞİM</h1>
-
-        <a href="#" class="btn" onclick="vCardIndir(); return false;">
-            <span>👤 Rehbere Kaydet</span>
-        </a>
-
-        <a href="https://wa.me/905457169891" class="btn" target="_blank">
-            <span>💬 WhatsApp</span>
-        </a>
-
-        <a href="tel:+905457169891" class="btn">
-            <span>📞 Ara</span>
-        </a>
-
-        <a href="https://instagram.com/temassizgirisim" class="btn" target="_blank">
-            <span>📸 Instagram</span>
-        </a>
-
-        <div class="iban-box">
-            <div class="iban-header">
-                <span>Banka Hesabı (IBAN)</span>
-                <span>Leman Tekin</span>
+    <div class="container">
+        <!-- MÜŞTERİ ÖDEME EKRANI -->
+        <div id="clientScreen">
+            <h2 id="clientTitle">@kullanici</h2>
+            <p class="subtitle">Ödeme için IBAN'ı kopyalayabilirsiniz</p>
+            
+            <div class="card">
+                <div class="label-small">Alıcı Ad Soyad</div>
+                <div class="value" id="resName">-</div>
             </div>
-            <div class="iban-number">TR17 0006 4000 0011 2330 6886 40</div>
-            <div style="text-align: right; margin-top: 12px;">
-                <button class="copy-btn" onclick="ibanKopyala()">Kopyala</button>
+            
+            <div class="card">
+                <div class="label-small">IBAN Numarası</div>
+                <div class="iban-row">
+                    <span class="iban-text" id="resIban">-</span>
+                    <button class="copy-btn" onclick="copyIban()">Kopyala</button>
+                </div>
             </div>
+        </div>
+
+        <div class="footer">
+            Temassız Girişim Altyapısı
         </div>
     </div>
 
     <script>
-        function ibanKopyala() {
-            navigator.clipboard.writeText("TR170006400000112330688640");
-            alert("IBAN kopyalandı!");
-        }
+        // BURAYA KENDİ KULLANICI ADINI, ADINI VE IBAN'INI YAZIYORSUN:
+        const kullanicilar = {
+            "zilan": {
+                name: "Zilan Üstündağ",
+                iban: "TR86 0001 0090 1011 3243 4050 01"
+            },
+            "ismail": {
+                name: "Muhammet İsmail Kılıç",
+                iban: "TR54 0015 7000 0000 0204 8311 36"
+            }
+            // Yeni biri olursa buraya virgül koyup alt alta ekleyebilirsin
+        };
 
-        function vCardIndir() {
-            const vcard = "BEGIN:VCARD\nVERSION:3.0\nFN:Temassız Girişim\nTEL:+905457169891\nEND:VCARD";
-            const blob = new Blob([vcard], { type: "text/vcard" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "temassiz-girisim.vcf";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const u = params.get('u'); // Örn: ?u=zilan
+
+            if (u && kullanicilar[u]) {
+                document.getElementById('clientTitle').innerText = "@" + u;
+                document.getElementById('resName').innerText = kullanicilar[u].name;
+                document.getElementById('resIban').innerText = kullanicilar[u].iban;
+            } else {
+                document.getElementById('clientScreen').innerHTML = '<h2 style="color:#ef4444; text-align:center;">Kullanıcı Bulunamadı</h2><p style="text-align:center; color:#666; margin-top:10px;">Bu linke ait ödeme bilgisi tanımlanmamış.</p>';
+            }
+        };
+
+        function copyIban() {
+            const iban = document.getElementById('resIban').innerText;
+            const btn = document.querySelector('.copy-btn');
+            navigator.clipboard.writeText(iban).then(() => {
+                btn.innerText = "Kopyalandı!";
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerText = "Kopyala";
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
         }
     </script>
-
 </body>
 </html>

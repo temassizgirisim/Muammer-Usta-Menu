@@ -43,6 +43,7 @@
             color: #666;
             text-align: center;
             margin-bottom: 20px;
+            line-height: 1.4;
         }
         .card {
             background: #fafafa;
@@ -132,7 +133,7 @@
     </div>
 
     <script>
-        // BURAYA KENDİ KULLANICI ADINI, ADINI VE IBAN'INI YAZIYORSUN:
+        // KULLANICI BİLGİLERİNİ BURAYA İSTEDİĞİN GİBİ EKLEYEBİLİRSİN:
         const kullanicilar = {
             "zilan": {
                 name: "Zilan Üstündağ",
@@ -142,20 +143,27 @@
                 name: "Muhammet İsmail Kılıç",
                 iban: "TR54 0015 7000 0000 0204 8311 36"
             }
-            // Yeni biri olursa buraya virgül koyup alt alta ekleyebilirsin
         };
 
         window.onload = function() {
             const params = new URLSearchParams(window.location.search);
             const u = params.get('u'); // Örn: ?u=zilan
 
-            if (u && kullanicilar[u]) {
-                document.getElementById('clientTitle').innerText = "@" + u;
-                document.getElementById('resName').innerText = kullanicilar[u].name;
-                document.getElementById('resIban').innerText = kullanicilar[u].iban;
-            } else {
-                document.getElementById('clientScreen').innerHTML = '<h2 style="color:#ef4444; text-align:center;">Kullanıcı Bulunamadı</h2><p style="text-align:center; color:#666; margin-top:10px;">Bu linke ait ödeme bilgisi tanımlanmamış.</p>';
+            if (u) {
+                const cleanKey = u.toLowerCase().trim();
+                if (kullanicilar[cleanKey]) {
+                    document.getElementById('clientTitle').innerText = "@" + cleanKey;
+                    document.getElementById('resName').innerText = kullanicilar[cleanKey].name;
+                    document.getElementById('resIban').innerText = kullanicilar[cleanKey].iban;
+                    return;
+                }
             }
+            
+            // Eğer kullanıcı adı bulunamazsa
+            document.getElementById('clientScreen').innerHTML = `
+                <h2 style="color:#ef4444; text-align:center;">Kullanıcı Bulunamadı</h2>
+                <p class="subtitle" style="margin-top:10px;">NFC kartına yazdığınız linkin sonuna kullanıcı adı eklediğinizden emin olun.<br><br><b>Örnek Doğru Link:</b><br>temassizgirisim.github.io/pay/?u=zilan</p>
+            `;
         };
 
         function copyIban() {

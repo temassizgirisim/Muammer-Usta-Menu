@@ -108,7 +108,7 @@
 <body>
 
     <div class="container">
-        <!-- MÜŞTERİ ÖDEME EKRANI -->
+        <!-- MÜŞTERİ ÖDEME Ekrani -->
         <div id="clientScreen">
             <h2 id="clientTitle">@kullanici</h2>
             <p class="subtitle">Ödeme için IBAN'ı kopyalayabilirsiniz</p>
@@ -133,7 +133,7 @@
     </div>
 
     <script>
-        // KULLANICI BİLGİLERİNİ BURAYA İSTEDİĞİN GİBİ EKLEYEBİLİRSİN:
+        // KULLANICI BİLGİLERİNİ BURAYA EKLEYEBİLİRSİN:
         const kullanicilar = {
             "zilan": {
                 name: "Zilan Üstündağ",
@@ -159,16 +159,19 @@
                 }
             }
             
-            // Eğer kullanıcı adı bulunamazsa
+            // Dinamik olarak mevcut sayfa adresini baz alan örnek link oluşturma
+            const currentUrl = window.location.origin + window.location.pathname;
             document.getElementById('clientScreen').innerHTML = `
                 <h2 style="color:#ef4444; text-align:center;">Kullanıcı Bulunamadı</h2>
-                <p class="subtitle" style="margin-top:10px;">NFC kartına yazdığınız linkin sonuna kullanıcı adı eklediğinizden emin olun.<br><br><b>Örnek Doğru Link:</b><br>temassizgirisim.github.io/pay/?u=zilan</p>
+                <p class="subtitle" style="margin-top:10px;">NFC kartına yazdığınız linkin sonuna kullanıcı adı eklediğinizden emin olun.<br><br><b>Örnek Doğru Link:</b><br>${currentUrl}?u=zilan</p>
             `;
         };
 
         function copyIban() {
             const iban = document.getElementById('resIban').innerText;
             const btn = document.querySelector('.copy-btn');
+            if (!iban || iban === '-') return;
+            
             navigator.clipboard.writeText(iban).then(() => {
                 btn.innerText = "Kopyalandı!";
                 btn.classList.add('copied');

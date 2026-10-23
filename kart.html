@@ -56,13 +56,7 @@
             font-weight: 700;
             margin-bottom: 4px;
         }
-        .value {
-            font-size: 15px;
-            font-weight: 600;
-            color: #111;
-            word-break: break-all;
-        }
-        .iban-row {
+        .row-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -72,12 +66,32 @@
             border-radius: 8px;
             margin-top: 4px;
         }
-        .iban-text {
+        .text-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111;
+            word-break: break-all;
+        }
+        .iban-font {
             font-family: monospace;
             font-size: 13px;
             font-weight: 700;
-            color: #000;
-            word-break: break-all;
+        }
+        .copy-btn {
+            background: #34c759;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            margin-left: 8px;
+            transition: background 0.2s;
+        }
+        .copy-btn.copied {
+            background: #248a3d;
         }
         .btn {
             background: #007aff;
@@ -91,13 +105,9 @@
             width: 100%;
             text-align: center;
             margin-top: 8px;
-            transition: background 0.2s;
         }
         .btn:hover {
             background: #0056b3;
-        }
-        .btn.success {
-            background: #34c759 !important;
         }
         input.form-input {
             width: 100%;
@@ -107,7 +117,6 @@
             font-size: 14px;
             outline: none;
             margin-bottom: 12px;
-            transition: border-color 0.2s;
         }
         input.form-input:focus {
             border-color: #007aff;
@@ -146,9 +155,7 @@
 </head>
 <body>
 
-    <div class="container" id="app">
-        <!-- İçerik JavaScript ile duruma göre yüklenecek -->
-    </div>
+    <div class="container" id="app"></div>
 
     <script>
         window.onload = function() {
@@ -158,38 +165,41 @@
             const app = document.getElementById('app');
 
             if (nameParam && ibanParam) {
-                // 1. DURUM: Müşteri NFC kartı okuttu -> Ödeme Ekranı
+                // MÜŞTERİ ÖDEME EKRANI (NFC Okutulduğunda Açılacak)
                 const decodedName = decodeURIComponent(nameParam);
                 const decodedIban = decodeURIComponent(ibanParam);
 
                 app.innerHTML = `
                     <h2>Hızlı Ödeme</h2>
-                    <p class="subtitle">Ödemeyi tamamlamak için alttaki IBAN'ı kopyalayabilirsiniz.</p>
+                    <p class="subtitle">Ödeme için alıcı adı veya IBAN'ı tek tıkla kopyalayabilirsiniz.</p>
                     
                     <div class="card">
                         <div class="label-small">Alıcı Ad Soyad</div>
-                        <div class="value">${escapeHtml(decodedName)}</div>
+                        <div class="row-content">
+                            <span class="text-value" id="nameText">${escapeHtml(decodedName)}</span>
+                            <button class="copy-btn" id="copyNameBtn" onclick="copyText('nameText', 'copyNameBtn')">Kopyala</button>
+                        </div>
                     </div>
                     
                     <div class="card">
                         <div class="label-small">IBAN Numarası</div>
-                        <div class="iban-row">
-                            <span class="iban-text" id="ibanText">${escapeHtml(decodedIban)}</span>
+                        <div class="row-content">
+                            <span class="text-value iban-font" id="ibanText">${escapeHtml(decodedIban)}</span>
+                            <button class="copy-btn" id="copyIbanBtn" onclick="copyText('ibanText', 'copyIbanBtn')">Kopyala</button>
                         </div>
-                        <button class="btn success" id="copyBtn" onclick="copyIban()" style="margin-top: 10px;">IBAN'ı Kopyala</button>
                     </div>
 
-                    <a href="${window.location.origin + window.location.pathname}" class="back-link">Kendi Kartım İçin Link Oluştur</a>
+                    <a href="${window.location.origin + window.location.pathname}" class="back-link">Yeni Kart İçin Link Oluştur</a>
                     <div class="footer">Temassız Girişim Altyapısı</div>
                 `;
             } else {
-                // 2. DURUM: Sen siteyi açtın -> Link Oluşturma Paneli
+                // LİNK OLUŞTURMA PANELİ (Senin Kartı Programlamadan Önce Açacağın Sayfa)
                 app.innerHTML = `
                     <h2>NFC Kart Link Sihirbazı</h2>
-                    <p class="subtitle">Kartın içine yazılacak linki saniyeler içinde oluşturun.</p>
+                    <p class="subtitle">Bilgileri girin, NFC karta yazılacak özel linki hemen oluşturun.</p>
                     
                     <div class="label-small">Alıcı Ad Soyad</div>
-                    <input type="text" id="inputName" class="form-input" placeholder="Örn: Zilan Üstündağ">
+                    <input type="text" id="inputName" class="form-input" placeholder="Örn: Ahmet Yılmaz">
                     
                     <div class="label-small">IBAN Numarası</div>
                     <input type="text" id="inputIban" class="form-input" placeholder="Örn: TR86 0001 ...">
@@ -198,7 +208,7 @@
 
                     <div id="outputArea" style="display:none;">
                         <div class="result-box" id="generatedLinkText"></div>
-                        <button class="btn success" onclick="copyGeneratedLink()" style="margin-top: 8px;">Oluşturulan Linki Tekrar Kopyala</button>
+                        <button class="btn" style="background:#34c759; margin-top: 8px;" onclick="copyGeneratedLink()">Oluşturulan Linki Tekrar Kopyala</button>
                     </div>
 
                     <div class="footer">Temassız Girişim Altyapısı</div>
@@ -211,7 +221,7 @@
             const iban = document.getElementById('inputIban').value.trim();
 
             if (!name || !iban) {
-                alert('Lütfen ad soyad ve IBAN alanlarını doldurun!');
+                alert('Lütfen alıcı ad soyad ve IBAN alanlarını doldurun!');
                 return;
             }
 
@@ -221,32 +231,34 @@
             document.getElementById('outputArea').style.display = 'block';
             document.getElementById('generatedLinkText').innerText = finalLink;
 
-            // Otomatik panoya kopyala
-            copyTextToClipboard(finalLink, function() {
-                alert('Link başarıyla kopyalandı! Şimdi bunu NFC kartınıza yazabilirsiniz.');
+            copyToClipboard(finalLink, function() {
+                alert('Link kopyalandı! Şimdi bunu NFC kartınıza yazabilirsiniz.');
             });
         }
 
         function copyGeneratedLink() {
             const linkText = document.getElementById('generatedLinkText').innerText;
-            copyTextToClipboard(linkText, function() {
+            copyToClipboard(linkText, function() {
                 alert('Link tekrar kopyalandı!');
             });
         }
 
-        function copyIban() {
-            const iban = document.getElementById('ibanText').innerText;
-            const btn = document.getElementById('copyBtn');
+        function copyText(elementId, buttonId) {
+            const text = document.getElementById(elementId).innerText;
+            const btn = document.getElementById(buttonId);
             
-            copyTextToClipboard(iban, function() {
-                btn.innerText = "Kopyalandı! ✓";
+            copyToClipboard(text, function() {
+                const originalText = btn.innerText;
+                btn.innerText = "Kopyalandı!";
+                btn.classList.add('copied');
                 setTimeout(() => {
-                    btn.innerText = "IBAN'ı Kopyala";
-                }, 2500);
+                    btn.innerText = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
             });
         }
 
-        function copyTextToClipboard(text, successCallback) {
+        function copyToClipboard(text, successCallback) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(successCallback).catch(() => {
                     fallbackCopy(text, successCallback);
@@ -259,7 +271,7 @@
         function fallbackCopy(text, successCallback) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
-            textArea.style.position = "fixed";  // Ekran dışına taşı
+            textArea.style.position = "fixed";
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();

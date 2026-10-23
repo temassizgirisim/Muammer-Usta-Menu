@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hızlı Ödeme | Temassız Girişim</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #f4f6f9;
+            color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #111;
+            text-align: center;
+        }
+        p.subtitle {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .card {
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .label-small {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111;
+            word-break: break-all;
+        }
+        .iban-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-top: 4px;
+        }
+        .iban-text {
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: #000;
+            word-break: break-all;
+        }
+        .btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn.success {
+            background: #34c759 !important;
+        }
+        input.form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+        input.form-input:focus {
+            border-color: #007aff;
+        }
+        .result-box {
+            background: #eef6ff;
+            border: 1px solid #bce0fd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            word-break: break-all;
+            font-size: 12px;
+            color: #004085;
+            font-family: monospace;
+        }
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #007aff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app">
+        <!-- İçerik JavaScript ile duruma göre yüklenecek -->
+    </div>
+
+    <script>
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const nameParam = params.get('name');
+            const ibanParam = params.get('iban');
+            const app = document.getElementById('app');
+
+            if (nameParam && ibanParam) {
+                // 1. DURUM: Müşteri NFC kartı okuttu -> Ödeme Ekranı
+                const decodedName = decodeURIComponent(nameParam);
+                const decodedIban = decodeURIComponent(ibanParam);
+
+                app.innerHTML = `
+                    <h2>Hızlı Ödeme</h2>
+                    <p class="subtitle">Ödemeyi tamamlamak için alttaki IBAN'ı kopyalayabilirsiniz.</p>
+                    
+                    <div class="card">
+                        <div class="label-small">Alıcı Ad Soyad</div>
+                        <div class="value">${escapeHtml(decodedName)}</div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="label-small">IBAN Numarası</div>
+                        <div class="iban-row">
+                            <span class="iban-text" id="ibanText">${escapeHtml(decodedIban)}</span>
+                        </div>
+                        <button class="btn success" id="copyBtn" onclick="copyIban()" style="margin-top: 10px;">IBAN'ı Kopyala</button>
+                    </div>
+
+                    <a href="${window.location.origin + window.location.pathname}" class="back-link">Kendi Kartım İçin Link Oluştur</a>
+                    <div class="footer">Temassız Girişim Altyapısı</div>
+                `;
+            } else {
+                // 2. DURUM: Sen siteyi açtın -> Link Oluşturma Paneli
+                app.innerHTML = `
+                    <h2>NFC Kart Link Sihirbazı</h2>
+                    <p class="subtitle">Kartın içine yazılacak linki saniyeler içinde oluşturun.</p>
+                    
+                    <div class="label-small">Alıcı Ad Soyad</div>
+                    <input type="text" id="inputName" class="form-input" placeholder="Örn: Zilan Üstündağ">
+                    
+                    <div class="label-small">IBAN Numarası</div>
+                    <input type="text" id="inputIban" class="form-input" placeholder="Örn: TR86 0001 ...">
+                    
+                    <button class="btn" onclick="generateLink()">Link Oluştur ve Kopyala</button>
+
+                    <div id="outputArea" style="display:none;">
+                        <div class="result-box" id="generatedLinkText"></div>
+                        <button class="btn success" onclick="copyGeneratedLink()" style="margin-top: 8px;">Oluşturulan Linki Tekrar Kopyala</button>
+                    </div>
+
+                    <div class="footer">Temassız Girişim Altyapısı</div>
+                `;
+            }
+        };
+
+        function generateLink() {
+            const name = document.getElementById('inputName').value.trim();
+            const iban = document.getElementById('inputIban').value.trim();
+
+            if (!name || !iban) {
+                alert('Lütfen ad soyad ve IBAN alanlarını doldurun!');
+                return;
+            }
+
+            const baseUrl = window.location.origin + window.location.pathname;
+            const finalLink = `${baseUrl}?name=${encodeURIComponent(name)}&iban=${encodeURIComponent(iban)}`;
+
+            document.getElementById('outputArea').style.display = 'block';
+            document.getElementById('generatedLinkText').innerText = finalLink;
+
+            // Otomatik panoya kopyala
+            copyTextToClipboard(finalLink, function() {
+                alert('Link başarıyla kopyalandı! Şimdi bunu NFC kartınıza yazabilirsiniz.');
+            });
+        }
+
+        function copyGeneratedLink() {
+            const linkText = document.getElementById('generatedLinkText').innerText;
+            copyTextToClipboard(linkText, function() {
+                alert('Link tekrar kopyalandı!');
+            });
+        }
+
+        function copyIban() {
+            const iban = document.getElementById('ibanText').innerText;
+            const btn = document.getElementById('copyBtn');
+            
+            copyTextToClipboard(iban, function() {
+                btn.innerText = "Kopyalandı! ✓";
+                setTimeout(() => {
+                    btn.innerText = "IBAN'ı Kopyala";
+                }, 2500);
+            });
+        }
+
+        function copyTextToClipboard(text, successCallback) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(successCallback).catch(() => {
+                    fallbackCopy(text, successCallback);
+                });
+            } else {
+                fallbackCopy(text, successCallback);
+            }
+        }
+
+        function fallbackCopy(text, successCallback) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  // Ekran dışına taşı
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) successCallback();
+                else alert('Kopyalama başarısız oldu.');
+            } catch (err) {
+                alert('Kopyalama desteklenmiyor.');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/[']/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
